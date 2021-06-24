@@ -2,18 +2,19 @@ package main
 
 import (
 	"fmt"
+	"github.com/MichalH95/exampleREST/controller"
 	"github.com/MichalH95/exampleREST/database"
+	"github.com/MichalH95/exampleREST/model"
 	"github.com/gofiber/fiber"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-func helloWorld(c *fiber.Ctx) {
-	c.Send("Hello, World!")
-}
+type Client model.Client
 
 func setupRoutes(app *fiber.App) {
-	app.Get("/", helloWorld)
+	app.Get("/clients", controller.GetClients)
+	app.Post("/clients", controller.PostClient)
 }
 
 func initDatabase() {
@@ -23,6 +24,7 @@ func initDatabase() {
 		panic("Failed to connect to database")
 	}
 	fmt.Println("Connection to database opened")
+	database.DBConn.AutoMigrate(&Client{})
 }
 
 func main() {
