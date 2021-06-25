@@ -1,9 +1,10 @@
 package model
 
-import "github.com/jinzhu/gorm"
+import "gorm.io/gorm"
 
 type Client struct {
 	gorm.Model
 	FirstName string
 	Surname   string
+	Company   Company
 }

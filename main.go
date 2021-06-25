@@ -6,11 +6,17 @@ import (
 	"github.com/MichalH95/exampleREST/database"
 	"github.com/MichalH95/exampleREST/model"
 	"github.com/gofiber/fiber"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-type Client model.Client
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "postgres"
+	password = "pass"
+	dbname   = "examplerest_db"
+)
 
 func setupRoutes(app *fiber.App) {
 	app.Get("/clients", controller.GetClients)
@@ -19,12 +25,19 @@ func setupRoutes(app *fiber.App) {
 
 func initDatabase() {
 	var err error
-	database.DBConn, err = gorm.Open("sqlite3", "books.db")
+
+	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=disable",
+		host, port, user, password, dbname)
+	database.DBConn, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
+	//gorm.Open("sqlite3", "books.db")
 	if err != nil {
 		panic("Failed to connect to database")
 	}
 	fmt.Println("Connection to database opened")
-	database.DBConn.AutoMigrate(&Client{})
+	database.DBConn.AutoMigrate(&model.Client{}, &model.Company{}, &model.Person{})
+	//database.DBConn.Model(&model.Company{}).AddForeignKey("client_id", "clients(id)", "RESTRICT", "RESTRICT")
+	//database.DBConn.Model(&model.Client{}).AddForeignKey("company_id", "companies(id)", "RESTRICT", "RESTRICT")
 }
 
 func main() {
@@ -34,5 +47,8 @@ func main() {
 	setupRoutes(app)
 	app.Listen(3000)
 
-	defer database.DBConn.Close()
+	sqlDB, err := database.DBConn.DB()
+	if err == nil {
+		defer sqlDB.Close()
+	}
 }
