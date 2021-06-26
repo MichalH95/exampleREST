@@ -21,6 +21,8 @@ const (
 func setupRoutes(app *fiber.App) {
 	app.Get("/clients", controller.GetClients)
 	app.Post("/clients", controller.PostClient)
+
+	app.Post("/sample", controller.PostSampleData)
 }
 
 func initDatabase() {
@@ -30,12 +32,11 @@ func initDatabase() {
 		host, port, user, password, dbname)
 	database.DBConn, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
-	//gorm.Open("sqlite3", "books.db")
 	if err != nil {
 		panic("Failed to connect to database")
 	}
 	fmt.Println("Connection to database opened")
-	database.DBConn.AutoMigrate(&model.Client{}, &model.Company{}, &model.Person{})
+	database.DBConn.AutoMigrate(&model.Company{}, &model.Person{}, &model.Client{})
 	//database.DBConn.Model(&model.Company{}).AddForeignKey("client_id", "clients(id)", "RESTRICT", "RESTRICT")
 	//database.DBConn.Model(&model.Client{}).AddForeignKey("company_id", "companies(id)", "RESTRICT", "RESTRICT")
 }
