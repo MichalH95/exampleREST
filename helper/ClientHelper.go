@@ -20,13 +20,6 @@ func NewClientAsPerson() model.Client {
 	}
 }
 
-func MessageJson(msg string) []byte {
-	ret, _ := json.Marshal(map[string]string{
-		"Message": msg,
-	})
-	return ret
-}
-
 func ErrorMessageJson(msg string) []byte {
 	ret, _ := json.Marshal(map[string]string{
 		"Error": msg,
