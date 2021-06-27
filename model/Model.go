@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+const ClientTypeCompany int = 1
+const ClientTypePerson int = 2
+
 type Company struct {
 	gorm.Model
 	Name             string
@@ -24,7 +27,8 @@ type Person struct {
 }
 
 type Client struct {
-	ID        uint `gorm:"primarykey"`
-	CompanyId sql.NullInt64
-	PersonId  sql.NullInt64
+	ID         uint `gorm:"primarykey"`
+	CompanyId  sql.NullInt64
+	PersonId   sql.NullInt64
+	ClientType int
 }

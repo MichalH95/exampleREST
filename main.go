@@ -20,7 +20,9 @@ const (
 
 func setupRoutes(app *fiber.App) {
 	app.Get("/clients", controller.GetClients)
-	app.Post("/clients", controller.PostClient)
+	app.Post("/clients", controller.AddClient)
+	app.Put("/clients/:id", controller.UpdateClient)
+	app.Delete("/clients/:id", controller.DeleteClient)
 
 	app.Post("/sample", controller.PostSampleData)
 }

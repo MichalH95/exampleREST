@@ -5,7 +5,8 @@ import (
 	"github.com/MichalH95/exampleREST/helper"
 	"github.com/MichalH95/exampleREST/model"
 	"github.com/gofiber/fiber"
-	time "time"
+	"gorm.io/gorm"
+	"time"
 )
 
 func GetClients(ctx *fiber.Ctx) {
@@ -29,8 +30,79 @@ func GetClients(ctx *fiber.Ctx) {
 	ctx.JSON(output)
 }
 
-func PostClient(ctx *fiber.Ctx) {
+func AddClient(ctx *fiber.Ctx) {
+	db := database.DBConn
 
+	// parse as company, then check for Client.ClientType
+	company := new(model.Company)
+	err := ctx.BodyParser(company)
+	if err != nil {
+		ctx.Status(503).Send(helper.ErrorMessageJson(err.Error()))
+		return
+	}
+	// check if received data has client type
+	if company.Client.ClientType != 1 && company.Client.ClientType != 2 {
+		// received data doesn't have valid client type
+		ctx.Status(400).Send(helper.ErrorMessageJson("Invalid Client.ClientType, specify either 1 for company or 2 for person"))
+		return
+	}
+	// check if received data is person
+	if company.Client.ClientType == model.ClientTypePerson {
+		// received data is person
+		person := new(model.Person)
+		err := ctx.BodyParser(person)
+		if err != nil {
+			ctx.Status(503).Send(helper.ErrorMessageJson(err.Error()))
+			return
+		}
+
+		person.Model = gorm.Model{}
+		person.Client = helper.NewClientAsPerson()
+
+		db.Create(person)
+
+		ctx.JSON(person)
+		return
+	}
+	// received data is company
+	company.Model = gorm.Model{}
+	company.Client = helper.NewClientAsCompany()
+
+	db.Create(company)
+
+	ctx.JSON(company)
+}
+
+func UpdateClient(ctx *fiber.Ctx) {
+
+}
+
+func DeleteClient(ctx *fiber.Ctx) {
+	id := ctx.Params("id")
+	db := database.DBConn
+
+	var client model.Client
+	db.First(&client, id)
+	if client.ClientType == 0 {
+		ctx.Status(400).Send(helper.ErrorMessageJson("No client found with this ID"))
+		return
+	}
+	if client.ClientType == 1 {
+		// client to delete is company
+		var company model.Company
+		db.Preload("Client").First(&company, client.CompanyId.Int64)
+		db.Delete(&company)
+		ctx.JSON(company)
+	}
+	if client.ClientType == 2 {
+		// client to delete is person
+		var person model.Person
+		db.Preload("Client").First(&person, client.PersonId.Int64)
+		db.Delete(&person)
+		ctx.JSON(person)
+	}
+
+	db.Delete(&client)
 }
 
 func PostSampleData(ctx *fiber.Ctx) {
@@ -42,7 +114,7 @@ func PostSampleData(ctx *fiber.Ctx) {
 	company1.ICO = "54321"
 	company1.ContactFirstName = "Josef"
 	company1.ContactLastName = "Chodounsky"
-	company1.Client = helper.NewClientWithCompanyId()
+	company1.Client = helper.NewClientAsCompany()
 	db.Create(&company1)
 
 	output = append(output, company1)
@@ -52,7 +124,7 @@ func PostSampleData(ctx *fiber.Ctx) {
 	company2.ICO = "37952"
 	company2.ContactFirstName = "Petr"
 	company2.ContactLastName = "Nemec"
-	company2.Client = helper.NewClientWithCompanyId()
+	company2.Client = helper.NewClientAsCompany()
 	db.Create(&company2)
 
 	output = append(output, company2)
@@ -61,7 +133,7 @@ func PostSampleData(ctx *fiber.Ctx) {
 	person1.FirstName = "Jan"
 	person1.LastName = "Novak"
 	person1.BirthDate = time.Now().AddDate(-25, 7, 2)
-	person1.Client = helper.NewClientWithPersonId()
+	person1.Client = helper.NewClientAsPerson()
 	db.Create(&person1)
 
 	output = append(output, person1)
@@ -70,7 +142,7 @@ func PostSampleData(ctx *fiber.Ctx) {
 	person2.FirstName = "Jaromir"
 	person2.LastName = "Meduna"
 	person2.BirthDate = time.Now().AddDate(-32, 4, 18)
-	person2.Client = helper.NewClientWithPersonId()
+	person2.Client = helper.NewClientAsPerson()
 	db.Create(&person2)
 
 	output = append(output, person2)
