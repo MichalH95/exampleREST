@@ -2,7 +2,6 @@ package client_controller
 
 import (
 	"github.com/MichalH95/exampleREST/database"
-	"github.com/MichalH95/exampleREST/helper"
 	"github.com/MichalH95/exampleREST/model"
 	"github.com/gofiber/fiber"
 	"time"
@@ -11,39 +10,50 @@ import (
 func AddSampleData(ctx *fiber.Ctx) {
 	db := database.DBConn
 
-	company1 := model.Company{
-		Name:             "Alza",
-		ICO:              "54321",
-		ContactFirstName: "Josef",
-		ContactLastName:  "Chodounsky",
-		Client:           helper.NewClientAsCompany(),
-	}
-	company2 := model.Company{
-		Name:             "CZC.cz",
-		ICO:              "37952",
-		ContactFirstName: "Petr",
-		ContactLastName:  "Nemec",
-		Client:           helper.NewClientAsCompany(),
-	}
-	person1 := model.Person{
-		FirstName: "Jan",
-		LastName:  "Novak",
-		BirthDate: time.Now().AddDate(-25, 7, 2),
-		Client:    helper.NewClientAsPerson(),
-	}
-	person2 := model.Person{
-		FirstName: "Jaromir",
-		LastName:  "Meduna",
-		BirthDate: time.Now().AddDate(-32, 4, 18),
-		Client:    helper.NewClientAsPerson(),
+	client1 := model.Client{
+		Company: model.Company{
+			Name:             "Alza",
+			ICO:              "54321",
+			ContactFirstName: "Josef",
+			ContactLastName:  "Chodounsky",
+		},
+		ClientType: model.ClientTypeCompany,
 	}
 
-	db.Create(&company1)
-	db.Create(&company2)
-	db.Create(&person1)
-	db.Create(&person2)
+	client2 := model.Client{
+		Company: model.Company{
+			Name:             "CZC.cz",
+			ICO:              "37952",
+			ContactFirstName: "Petr",
+			ContactLastName:  "Nemec",
+		},
+		ClientType: model.ClientTypeCompany,
+	}
 
-	output := []interface{}{company1, company2, person1, person2}
+	client3 := model.Client{
+		Person: model.Person{
+			FirstName: "Jan",
+			LastName:  "Novak",
+			BirthDate: time.Now().AddDate(-25, 7, 2),
+		},
+		ClientType: model.ClientTypePerson,
+	}
+
+	client4 := model.Client{
+		Person: model.Person{
+			FirstName: "Jaromir",
+			LastName:  "Meduna",
+			BirthDate: time.Now().AddDate(-32, 4, 18),
+		},
+		ClientType: model.ClientTypePerson,
+	}
+
+	db.Create(&client1)
+	db.Create(&client2)
+	db.Create(&client3)
+	db.Create(&client4)
+
+	output := []interface{}{client1, client2, client3, client4}
 
 	ctx.JSON(output)
 }

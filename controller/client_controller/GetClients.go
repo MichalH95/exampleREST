@@ -7,22 +7,10 @@ import (
 )
 
 func GetClients(ctx *fiber.Ctx) {
-	var output []interface{}
 	db := database.DBConn
 
-	var companies []model.Company
-	db.Preload("Client").Find(&companies)
+	var clients []model.Client
+	db.Preload("Company").Preload("Person").Find(&clients)
 
-	for _, company := range companies {
-		output = append(output, company)
-	}
-
-	var people []model.Person
-	db.Preload("Client").Find(&people)
-
-	for _, person := range people {
-		output = append(output, person)
-	}
-
-	ctx.JSON(output)
+	ctx.JSON(clients)
 }

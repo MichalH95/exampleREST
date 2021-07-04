@@ -31,7 +31,7 @@ func initDatabase() {
 		panic("Failed to connect to database")
 	}
 	fmt.Println("Connection to database opened")
-	database.DBConn.AutoMigrate(&model.Company{}, &model.Person{}, &model.Client{})
+	database.DBConn.AutoMigrate(&model.Client{}, &model.Company{}, &model.Person{})
 }
 
 func main() {

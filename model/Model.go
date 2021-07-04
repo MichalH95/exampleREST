@@ -1,34 +1,33 @@
 package model
 
 import (
-	"database/sql"
 	"gorm.io/gorm"
 	"time"
 )
 
-const ClientTypeCompany int = 1
-const ClientTypePerson int = 2
+const ClientTypeCompany = "Company"
+const ClientTypePerson = "Person"
 
 type Company struct {
-	gorm.Model
+	ID               uint `gorm:"primarykey"`
 	Name             string
 	ICO              string
 	ContactFirstName string
 	ContactLastName  string
-	Client           Client
+	ClientId         uint
 }
 
 type Person struct {
-	gorm.Model
+	ID        uint `gorm:"primarykey"`
 	FirstName string
 	LastName  string
 	BirthDate time.Time
-	Client    Client
+	ClientId  uint
 }
 
 type Client struct {
-	ID         uint `gorm:"primarykey"`
-	CompanyId  sql.NullInt64
-	PersonId   sql.NullInt64
-	ClientType int
+	gorm.Model
+	ClientType string
+	Company    Company
+	Person     Person
 }
