@@ -19,6 +19,7 @@ func DeleteClient(ctx *fiber.Ctx) {
 		return
 	}
 
-	ctx.JSON(client)
 	db.Select(clause.Associations).Delete(&client)
+
+	ctx.JSON(client)
 }

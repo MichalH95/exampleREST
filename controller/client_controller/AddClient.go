@@ -5,7 +5,6 @@ import (
 	"github.com/MichalH95/exampleREST/helper"
 	"github.com/MichalH95/exampleREST/model"
 	"github.com/gofiber/fiber"
-	"gorm.io/gorm"
 )
 
 func AddClient(ctx *fiber.Ctx) {
@@ -25,7 +24,7 @@ func AddClient(ctx *fiber.Ctx) {
 		return
 	}
 
-	client.Model = gorm.Model{}
+	client.ID = 0
 	client.Company.ID = 0
 	client.Person.ID = 0
 

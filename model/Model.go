@@ -1,7 +1,6 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -26,7 +25,7 @@ type Person struct {
 }
 
 type Client struct {
-	gorm.Model
+	ID         uint `gorm:"primarykey"`
 	ClientType string
 	Company    Company `gorm:"constraint:OnDelete:CASCADE;"`
 	Person     Person  `gorm:"constraint:OnDelete:CASCADE;"`
