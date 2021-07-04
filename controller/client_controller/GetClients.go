@@ -4,13 +4,14 @@ import (
 	"github.com/MichalH95/exampleREST/database"
 	"github.com/MichalH95/exampleREST/model"
 	"github.com/gofiber/fiber"
+	"gorm.io/gorm/clause"
 )
 
 func GetClients(ctx *fiber.Ctx) {
 	db := database.DBConn
 
 	var clients []model.Client
-	db.Preload("Company").Preload("Person").Find(&clients)
+	db.Preload(clause.Associations).Find(&clients)
 
 	ctx.JSON(clients)
 }

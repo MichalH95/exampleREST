@@ -28,6 +28,6 @@ type Person struct {
 type Client struct {
 	gorm.Model
 	ClientType string
-	Company    Company
-	Person     Person
+	Company    Company `gorm:"constraint:OnDelete:CASCADE;"`
+	Person     Person  `gorm:"constraint:OnDelete:CASCADE;"`
 }

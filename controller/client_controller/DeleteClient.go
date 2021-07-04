@@ -5,6 +5,7 @@ import (
 	"github.com/MichalH95/exampleREST/helper"
 	"github.com/MichalH95/exampleREST/model"
 	"github.com/gofiber/fiber"
+	"gorm.io/gorm/clause"
 )
 
 func DeleteClient(ctx *fiber.Ctx) {
@@ -12,12 +13,12 @@ func DeleteClient(ctx *fiber.Ctx) {
 	db := database.DBConn
 
 	var client model.Client
-	db.Preload("Person").Preload("Company").First(&client, id)
+	db.Preload(clause.Associations).First(&client, id)
 	if client.ClientType == "" {
 		ctx.Status(400).Send(helper.ErrorMessageJson("No client found with this ID"))
 		return
 	}
 
 	ctx.JSON(client)
-	db.Delete(&client)
+	db.Select(clause.Associations).Delete(&client)
 }
