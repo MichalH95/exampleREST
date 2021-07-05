@@ -1,9 +1,10 @@
 package client_controller
 
 import (
+	"github.com/MichalH95/exampleREST/controller/error_controller"
 	"github.com/MichalH95/exampleREST/database"
-	"github.com/MichalH95/exampleREST/helper"
 	"github.com/MichalH95/exampleREST/model"
+	"github.com/MichalH95/exampleREST/model/error_response"
 	"github.com/gofiber/fiber"
 )
 
@@ -14,13 +15,13 @@ func AddClient(ctx *fiber.Ctx) {
 	err := ctx.BodyParser(&client)
 
 	if err != nil {
-		ctx.Status(503).Send(helper.ErrorMessageJson(err.Error()))
+		error_controller.ServerErrorResponse(ctx, err.Error())
 		return
 	}
 
 	if client.ClientType != model.ClientTypeCompany && client.ClientType != model.ClientTypePerson {
 		// received data doesn't have valid client type
-		ctx.Status(400).Send(helper.ErrorMessageJson("Invalid Client.ClientType, specify either 1 for company or 2 for person"))
+		error_controller.ClientErrorResponse(ctx, error_response.InvalidClientType)
 		return
 	}
 

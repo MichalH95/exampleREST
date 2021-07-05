@@ -1,9 +1,10 @@
 package client_controller
 
 import (
+	"github.com/MichalH95/exampleREST/controller/error_controller"
 	"github.com/MichalH95/exampleREST/database"
-	"github.com/MichalH95/exampleREST/helper"
 	"github.com/MichalH95/exampleREST/model"
+	"github.com/MichalH95/exampleREST/model/error_response"
 	"github.com/gofiber/fiber"
 	"gorm.io/gorm/clause"
 	"strconv"
@@ -14,7 +15,7 @@ func UpdateClient(ctx *fiber.Ctx) {
 	idUint64, convErr := strconv.ParseUint(idStr, 10, 32)
 
 	if convErr != nil {
-		ctx.Status(400).Send(helper.ErrorMessageJson("Negative client id"))
+		error_controller.ClientErrorResponse(ctx, error_response.NegativeClientId)
 		return
 	}
 
@@ -26,7 +27,7 @@ func UpdateClient(ctx *fiber.Ctx) {
 	var client model.Client
 	db.Preload(clause.Associations).First(&client, id)
 	if client.ClientType == "" {
-		ctx.Status(400).Send(helper.ErrorMessageJson("No client found with this ID"))
+		error_controller.ClientErrorResponse(ctx, error_response.NoClientWithThisId)
 		return
 	}
 
@@ -38,13 +39,13 @@ func UpdateClient(ctx *fiber.Ctx) {
 	err := ctx.BodyParser(&client)
 
 	if err != nil {
-		ctx.Status(503).Send(helper.ErrorMessageJson(err.Error()))
+		error_controller.ServerErrorResponse(ctx, err.Error())
 		return
 	}
 
 	if client.ClientType != model.ClientTypeCompany && client.ClientType != model.ClientTypePerson {
 		// received data doesn't have valid client type
-		ctx.Status(400).Send(helper.ErrorMessageJson("Invalid Client.ClientType, specify either 1 for company or 2 for person"))
+		error_controller.ClientErrorResponse(ctx, error_response.InvalidClientType)
 		return
 	}
 
